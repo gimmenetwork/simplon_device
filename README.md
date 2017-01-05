@@ -7,6 +7,8 @@
                 |_|                                                
 </pre>
 
+[![Build Status](https://travis-ci.org/fightbulc/simplon_device.svg?branch=master)](https://travis-ci.org/fightbulc/simplon_device)
+
 -------------------------------------------------
 
 # License
