@@ -88,4 +88,28 @@ class Device
     {
         return $this->detector->isBot();
     }
+
+    /**
+     * @return bool
+     */
+    public function isTypeTablet(): bool
+    {
+        return $this->getType() === self::TYPE_TABLET;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTypeMobile(): bool
+    {
+        return $this->getType() === self::TYPE_MOBILE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTypeFallback(): bool
+    {
+        return !$this->isTypeMobile() && !$this->isTypeTablet();
+    }
 }
