@@ -28,7 +28,7 @@ class Device
      */
     public function __construct(string $agent = null)
     {
-        if ($agent === null)
+        if ($agent === null && !empty($_SERVER['HTTP_USER_AGENT']))
         {
             $agent = $_SERVER['HTTP_USER_AGENT'];
         }

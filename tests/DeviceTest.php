@@ -34,6 +34,13 @@ class DeviceTest extends TestCase
         $this->assertEquals($isBot, $dd->isBot());
     }
 
+    public function testEmpty()
+    {
+        $dd = new Device();
+        $this->assertEquals(Device::TYPE_FALLBACK, $dd->getType());
+        $this->assertEquals(Device::MODEL_FALLBACK, $dd->getModel());
+    }
+
     /**
      * @return array
      */
