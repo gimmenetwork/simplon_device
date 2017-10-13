@@ -3,6 +3,7 @@
 namespace Simplon\Device;
 
 use DeviceDetector\DeviceDetector;
+use Doctrine\Common\Cache\PhpFileCache;
 
 /**
  * Class Device
@@ -25,8 +26,11 @@ class Device
 
     /**
      * @param string|null $agent
+     * @param bool $useCaching
+     *
+     * @throws \Exception
      */
-    public function __construct(string $agent = null)
+    public function __construct(string $agent = null, bool $useCaching = false)
     {
         if ($agent === null && !empty($_SERVER['HTTP_USER_AGENT']))
         {
@@ -34,6 +38,12 @@ class Device
         }
 
         $this->detector = new DeviceDetector($agent);
+
+        if ($useCaching)
+        {
+            $this->detector->setCache(new PhpFileCache('./tmp/'));
+        }
+
         $this->detector->parse();
     }
 
