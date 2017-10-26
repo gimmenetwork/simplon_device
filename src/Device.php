@@ -3,12 +3,8 @@
 namespace Simplon\Device;
 
 use DeviceDetector\DeviceDetector;
-use Doctrine\Common\Cache\PhpFileCache;
+use Doctrine\Common\Cache\CacheProvider;
 
-/**
- * Class Device
- * @package Simplon\Device
- */
 class Device
 {
     const MODEL_FALLBACK = 'FALLBACK';
@@ -26,11 +22,11 @@ class Device
 
     /**
      * @param string|null $agent
-     * @param bool $useCaching
+     * @param CacheProvider|null $cacheProvider
      *
      * @throws \Exception
      */
-    public function __construct(string $agent = null, bool $useCaching = false)
+    public function __construct(string $agent = null, ?CacheProvider $cacheProvider = null)
     {
         if ($agent === null && !empty($_SERVER['HTTP_USER_AGENT']))
         {
@@ -39,9 +35,9 @@ class Device
 
         $this->detector = new DeviceDetector($agent);
 
-        if ($useCaching)
+        if ($cacheProvider)
         {
-            $this->detector->setCache(new PhpFileCache('./tmp/'));
+            $this->detector->setCache($cacheProvider);
         }
 
         $this->detector->parse();
