@@ -92,7 +92,14 @@ class Device
      */
     public function isBot(): bool
     {
-        return $this->detector->isBot();
+        $hasLanguage = false;
+
+        if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+        {
+            $hasLanguage = true;
+        }
+
+        return $this->detector->isBot() || !$hasLanguage;
     }
 
     /**
