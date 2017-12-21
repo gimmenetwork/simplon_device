@@ -19,6 +19,10 @@ class Device
      * @var DeviceDetector
      */
     private $detector;
+    /**
+     * @var null|string
+     */
+    private $agent;
 
     /**
      * @param string|null $agent
@@ -41,6 +45,7 @@ class Device
         }
 
         $this->detector->parse();
+        $this->agent = $agent;
     }
 
     /**
@@ -92,14 +97,20 @@ class Device
      */
     public function isBot(): bool
     {
-        $hasLanguage = false;
+        $isBot = $this->detector->isBot();
 
-        if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+        if (!$isBot && preg_match('/facebookexternalhit|crawler|bot|adsbot|googlebot/i', $this->agent) !== false)
         {
-            $hasLanguage = true;
+            $isBot = true;
         }
 
-        return $this->detector->isBot() || !$hasLanguage;
+        if (!$isBot)
+        {
+            $language = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null;
+            $isBot = $language === null;
+        }
+
+        return $isBot;
     }
 
     /**
