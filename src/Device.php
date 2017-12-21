@@ -99,7 +99,7 @@ class Device
     {
         $isBot = $this->detector->isBot();
 
-        if (!$isBot && preg_match('/facebookexternalhit|crawler|bot|adsbot|googlebot/i', $this->agent) !== false)
+        if (!$isBot && preg_match('/facebookexternalhit|crawler|bot|adsbot|googlebot/i', $this->agent))
         {
             $isBot = true;
         }
