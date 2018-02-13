@@ -25,7 +25,7 @@ class Device
     private $agent;
 
     /**
-     * @param string|null $agent
+     * @param string|null        $agent
      * @param CacheProvider|null $cacheProvider
      *
      * @throws \Exception
@@ -97,20 +97,7 @@ class Device
      */
     public function isBot(): bool
     {
-        $isBot = $this->detector->isBot();
-
-        if (!$isBot && preg_match('/facebookexternalhit|crawler|bot|adsbot|googlebot|outbrain/i', $this->agent))
-        {
-            $isBot = true;
-        }
-
-        if (!$isBot)
-        {
-            $language = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null;
-            $isBot = $language === null;
-        }
-
-        return $isBot;
+        return $this->detector->isBot();
     }
 
     /**
