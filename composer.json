@@ -15,7 +15,6 @@
       "role": "developer"
     }
   ],
-  "minimum-stability": "dev",
   "require": {
     "php": ">=7.1",
     "mobiledetect/mobiledetectlib": "^2.8",
