@@ -2,10 +2,9 @@
 
 namespace Simplon\Device;
 
-use DeviceDetector\DeviceDetector;
-use Doctrine\Common\Cache\CacheProvider;
+use Jaybizzle\CrawlerDetect\CrawlerDetect;
 
-class Device
+class Device implements DeviceInterface
 {
     const MODEL_FALLBACK = 'FALLBACK';
     const MODEL_IOS = 'IOS';
@@ -16,36 +15,23 @@ class Device
     const TYPE_MOBILE = 'MOBILE';
 
     /**
-     * @var DeviceDetector
+     * @var \Mobile_Detect
      */
-    private $detector;
+    private $mobileDetect;
     /**
-     * @var null|string
+     * @var CrawlerDetect
      */
-    private $agent;
+    private $crawlerDetect;
 
     /**
-     * @param string|null        $agent
-     * @param CacheProvider|null $cacheProvider
+     * @param string|null $agent
      *
      * @throws \Exception
      */
-    public function __construct(string $agent = null, ?CacheProvider $cacheProvider = null)
+    public function __construct(string $agent = null)
     {
-        if ($agent === null && !empty($_SERVER['HTTP_USER_AGENT']))
-        {
-            $agent = $_SERVER['HTTP_USER_AGENT'];
-        }
-
-        $this->detector = new DeviceDetector($agent);
-
-        if ($cacheProvider)
-        {
-            $this->detector->setCache($cacheProvider);
-        }
-
-        $this->detector->parse();
-        $this->agent = $agent;
+        $this->mobileDetect = new \Mobile_Detect(null, $agent);
+        $this->crawlerDetect = new CrawlerDetect(null, $agent);
     }
 
     /**
@@ -54,18 +40,13 @@ class Device
     public function getModel(): string
     {
         $model = self::MODEL_FALLBACK;
-        $osName = null;
 
-        if ($osName = isset($this->detector->getOs()['name']))
-        {
-            $osName = strtolower($this->detector->getOs()['name']);
-        }
-
-        if ($osName === 'ios')
+        if ($this->mobileDetect->isIOS())
         {
             $model = self::MODEL_IOS;
         }
-        elseif ($osName === 'android')
+
+        elseif ($this->mobileDetect->isAndroidOs())
         {
             $model = self::MODEL_ANDROID;
         }
@@ -80,11 +61,11 @@ class Device
     {
         $type = self::TYPE_FALLBACK;
 
-        if ($this->detector->isTablet())
+        if ($this->mobileDetect->isTablet())
         {
             $type = self::TYPE_TABLET;
         }
-        elseif ($this->detector->isMobile())
+        elseif ($this->mobileDetect->isMobile())
         {
             $type = self::TYPE_MOBILE;
         }
@@ -97,7 +78,7 @@ class Device
      */
     public function isBot(): bool
     {
-        return $this->detector->isBot();
+        return $this->crawlerDetect->isCrawler();
     }
 
     /**

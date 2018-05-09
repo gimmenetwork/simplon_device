@@ -3,9 +3,6 @@
 use PHPUnit\Framework\TestCase;
 use Simplon\Device\Device;
 
-/**
- * Class DeviceTest
- */
 class DeviceTest extends TestCase
 {
     /**
@@ -14,6 +11,7 @@ class DeviceTest extends TestCase
      * @param string $model
      *
      * @dataProvider deviceProvider
+     * @throws Exception
      */
     public function testDevice(string $agent, string $type, string $model)
     {
@@ -24,9 +22,10 @@ class DeviceTest extends TestCase
 
     /**
      * @param string $agent
-     * @param bool $isBot
+     * @param bool   $isBot
      *
      * @dataProvider botProvider
+     * @throws Exception
      */
     public function testBots(string $agent, bool $isBot)
     {
@@ -34,6 +33,9 @@ class DeviceTest extends TestCase
         $this->assertEquals($isBot, $dd->isBot());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testEmpty()
     {
         $dd = new Device();
@@ -60,7 +62,9 @@ class DeviceTest extends TestCase
             #
 
             ['Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1', Device::TYPE_TABLET, Device::MODEL_IOS],
-            ['Mozilla/5.0 (Linux; Android 7.0; Pixel C Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/52.0.2743.98 Safari/537.36', Device::TYPE_TABLET, Device::MODEL_ANDROID],
+            ['Mozilla/5.0 (iPad; CPU OS 9_3_2 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13F69 Safari/601.1', Device::TYPE_TABLET, Device::MODEL_IOS],
+            ['Mozilla/5.0 (Linux; Android 4.4.2; en-us; SAMSUNG SM-T230NU Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/1.5 Chrome/28.0.1500.94 Safari/537.36', Device::TYPE_TABLET, Device::MODEL_ANDROID],
+            ['Mozilla/5.0 (Linux; U; Android 4.2.2; en-us; GT-P5113 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30', Device::TYPE_TABLET, Device::MODEL_ANDROID],
 
             #
             # FALLBACK
