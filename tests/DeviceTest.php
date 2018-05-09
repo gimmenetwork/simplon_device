@@ -56,6 +56,7 @@ class DeviceTest extends TestCase
             ['Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1', Device::TYPE_MOBILE, Device::MODEL_IOS],
             ['Mozilla/5.0 (Linux; Android 5.1.1; Nexus 6 Build/LYZ28E) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Mobile Safari/537.36', Device::TYPE_MOBILE, Device::MODEL_ANDROID],
             ['Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Mobile Safari/537.36', Device::TYPE_MOBILE, Device::MODEL_ANDROID],
+            ['Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', Device::TYPE_MOBILE, Device::MODEL_ANDROID],
 
             #
             # TABLET
@@ -80,6 +81,7 @@ class DeviceTest extends TestCase
     public function botProvider()
     {
         return [
+            ['Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', true],
             ['Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', true],
             ['Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)', true],
             ['Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)', true],
