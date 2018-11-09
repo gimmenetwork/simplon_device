@@ -32,6 +32,18 @@ class Device implements DeviceInterface
      * @var StorageInterface|null
      */
     private $storage;
+    /**
+     * @var string
+     */
+    private $model;
+    /**
+     * @var string
+     */
+    private $type;
+    /**
+     * @var bool
+     */
+    private $isBot;
 
     /**
      * @param string|null $agent
@@ -74,24 +86,29 @@ class Device implements DeviceInterface
             return $model;
         }
 
-        $model = self::MODEL_FALLBACK;
-
-        if ($this->mobileDetect->isIOS())
+        if (!$this->model)
         {
-            $model = self::MODEL_IOS;
+            $model = self::MODEL_FALLBACK;
+
+            if ($this->mobileDetect->isIOS())
+            {
+                $model = self::MODEL_IOS;
+            }
+
+            elseif ($this->mobileDetect->isAndroidOs())
+            {
+                $model = self::MODEL_ANDROID;
+            }
+
+            if ($this->hasStorage())
+            {
+                $this->setStoredValue(self::STORAGE_KEY_MODEL, $model);
+            }
+
+            $this->model = $model;
         }
 
-        elseif ($this->mobileDetect->isAndroidOs())
-        {
-            $model = self::MODEL_ANDROID;
-        }
-
-        if ($this->hasStorage())
-        {
-            $this->setStoredValue(self::STORAGE_KEY_MODEL, $model);
-        }
-
-        return $model;
+        return $this->model;
     }
 
     /**
@@ -104,23 +121,28 @@ class Device implements DeviceInterface
             return $type;
         }
 
-        $type = self::TYPE_FALLBACK;
-
-        if ($this->mobileDetect->isTablet())
+        if (!$this->type)
         {
-            $type = self::TYPE_TABLET;
-        }
-        elseif ($this->mobileDetect->isMobile())
-        {
-            $type = self::TYPE_MOBILE;
+            $type = self::TYPE_FALLBACK;
+
+            if ($this->mobileDetect->isTablet())
+            {
+                $type = self::TYPE_TABLET;
+            }
+            elseif ($this->mobileDetect->isMobile())
+            {
+                $type = self::TYPE_MOBILE;
+            }
+
+            if ($this->hasStorage())
+            {
+                $this->setStoredValue(self::STORAGE_KEY_TYPE, $type);
+            }
+
+            $this->type = $type;
         }
 
-        if ($this->hasStorage())
-        {
-            $this->setStoredValue(self::STORAGE_KEY_TYPE, $type);
-        }
-
-        return $type;
+        return $this->type;
     }
 
     /**
@@ -133,14 +155,17 @@ class Device implements DeviceInterface
             return $isBot;
         }
 
-        $isBot = $this->crawlerDetect->isCrawler();
-
-        if ($this->hasStorage())
+        if ($this->isBot === null)
         {
-            $this->setStoredValue(self::STORAGE_KEY_BOT, $isBot);
+            $this->isBot = $this->crawlerDetect->isCrawler();
+
+            if ($this->hasStorage())
+            {
+                $this->setStoredValue(self::STORAGE_KEY_BOT, $this->isBot);
+            }
         }
 
-        return $isBot;
+        return $this->isBot;
     }
 
     /**
