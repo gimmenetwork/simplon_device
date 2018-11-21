@@ -7,28 +7,25 @@ interface DeviceInterface
     /**
      * @return string
      */
-    public function getModel(): string;
-    /**
-     * @return string
-     */
     public function getType(): string;
-    /**
-     * @return bool
-     */
-    public function isBot(): bool;
 
     /**
      * @return bool
      */
-    public function isTypeTablet(): bool;
+    public function isCrawler(): bool;
 
     /**
      * @return bool
      */
-    public function isTypeMobile(): bool;
+    public function isTablet(): bool;
 
     /**
      * @return bool
      */
-    public function isTypeFallback(): bool;
+    public function isMobile(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isDesktop(): bool;
 }

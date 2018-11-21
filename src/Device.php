@@ -3,47 +3,26 @@
 namespace Simplon\Device;
 
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
-use Simplon\Interfaces\StorageInterface;
 
 class Device implements DeviceInterface
 {
-    const MODEL_FALLBACK = 'FALLBACK';
-    const MODEL_IOS = 'IOS';
-    const MODEL_ANDROID = 'ANDROID';
-
-    const TYPE_FALLBACK = 'FALLBACK';
-    const TYPE_TABLET = 'TABLET';
-    const TYPE_MOBILE = 'MOBILE';
-
-    const STORAGE_NAMESPACE = 'device-detection';
-    const STORAGE_KEY_MODEL = 'model';
-    const STORAGE_KEY_TYPE = 'type';
-    const STORAGE_KEY_BOT = 'bot';
+    const TYPE_DESKTOP = 'desktop';
+    const TYPE_TABLET = 'tablet';
+    const TYPE_MOBILE = 'mobile';
+    const TYPE_CRAWLER = 'crawler';
 
     /**
-     * @var \Mobile_Detect
+     * @var string|null
      */
-    private $mobileDetect;
-    /**
-     * @var CrawlerDetect
-     */
-    private $crawlerDetect;
-    /**
-     * @var StorageInterface|null
-     */
-    private $storage;
+    protected $agent;
     /**
      * @var string
      */
-    private $model;
+    private $envData;
     /**
      * @var string
      */
     private $type;
-    /**
-     * @var bool
-     */
-    private $isBot;
 
     /**
      * @param string|null $agent
@@ -52,63 +31,8 @@ class Device implements DeviceInterface
      */
     public function __construct(string $agent = null)
     {
-        $this->mobileDetect = new \Mobile_Detect(null, $agent);
-        $this->crawlerDetect = new CrawlerDetect(null, $agent);
-    }
-
-    /**
-     * @return StorageInterface|null
-     */
-    public function getStorage(): ?StorageInterface
-    {
-        return $this->storage;
-    }
-
-    /**
-     * @param StorageInterface $storage
-     *
-     * @return Device
-     */
-    public function setStorage(StorageInterface $storage): Device
-    {
-        $this->storage = $storage;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getModel(): string
-    {
-        if ($this->hasStorage() && $model = $this->fetchStoredValue(self::STORAGE_KEY_MODEL))
-        {
-            return $model;
-        }
-
-        if (!$this->model)
-        {
-            $model = self::MODEL_FALLBACK;
-
-            if ($this->mobileDetect->isIOS())
-            {
-                $model = self::MODEL_IOS;
-            }
-
-            elseif ($this->mobileDetect->isAndroidOs())
-            {
-                $model = self::MODEL_ANDROID;
-            }
-
-            if ($this->hasStorage())
-            {
-                $this->setStoredValue(self::STORAGE_KEY_MODEL, $model);
-            }
-
-            $this->model = $model;
-        }
-
-        return $this->model;
+        $this->agent = $agent;
+        $this->envData = getenv('DEVICE');
     }
 
     /**
@@ -116,30 +40,9 @@ class Device implements DeviceInterface
      */
     public function getType(): string
     {
-        if ($this->hasStorage() && $type = $this->fetchStoredValue(self::STORAGE_KEY_TYPE))
-        {
-            return $type;
-        }
-
         if (!$this->type)
         {
-            $type = self::TYPE_FALLBACK;
-
-            if ($this->mobileDetect->isTablet())
-            {
-                $type = self::TYPE_TABLET;
-            }
-            elseif ($this->mobileDetect->isMobile())
-            {
-                $type = self::TYPE_MOBILE;
-            }
-
-            if ($this->hasStorage())
-            {
-                $this->setStoredValue(self::STORAGE_KEY_TYPE, $type);
-            }
-
-            $this->type = $type;
+            $this->type = $this->envData ? $this->envData : $this->getTypeByMobileDetect();
         }
 
         return $this->type;
@@ -148,30 +51,15 @@ class Device implements DeviceInterface
     /**
      * @return bool
      */
-    public function isBot(): bool
+    public function isCrawler(): bool
     {
-        if ($this->hasStorage() && $isBot = $this->fetchStoredValue(self::STORAGE_KEY_BOT))
-        {
-            return $isBot;
-        }
-
-        if ($this->isBot === null)
-        {
-            $this->isBot = $this->crawlerDetect->isCrawler();
-
-            if ($this->hasStorage())
-            {
-                $this->setStoredValue(self::STORAGE_KEY_BOT, $this->isBot);
-            }
-        }
-
-        return $this->isBot;
+        return $this->getType() === self::TYPE_CRAWLER;
     }
 
     /**
      * @return bool
      */
-    public function isTypeTablet(): bool
+    public function isTablet(): bool
     {
         return $this->getType() === self::TYPE_TABLET;
     }
@@ -179,7 +67,7 @@ class Device implements DeviceInterface
     /**
      * @return bool
      */
-    public function isTypeMobile(): bool
+    public function isMobile(): bool
     {
         return $this->getType() === self::TYPE_MOBILE;
     }
@@ -187,39 +75,34 @@ class Device implements DeviceInterface
     /**
      * @return bool
      */
-    public function isTypeFallback(): bool
+    public function isDesktop(): bool
     {
-        return !$this->isTypeMobile() && !$this->isTypeTablet();
+        return $this->getType() === self::TYPE_DESKTOP;
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    private function hasStorage(): bool
+    private function getTypeByMobileDetect(): string
     {
-        return $this->getStorage() !== null;
-    }
+        $mobileDetect = new \Mobile_Detect(null, $this->agent);
+        $crawlerDetect = new CrawlerDetect(null, $this->agent);
 
-    /**
-     * @param string $key
-     *
-     * @return mixed|null
-     */
-    private function fetchStoredValue(string $key)
-    {
-        return $this->getStorage()->get(self::STORAGE_NAMESPACE . '-' . $key);
-    }
+        $type = self::TYPE_DESKTOP;
 
-    /**
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return Device
-     */
-    private function setStoredValue(string $key, $value): self
-    {
-        $this->getStorage()->set(self::STORAGE_NAMESPACE . '-' . $key, $value);
+        if ($crawlerDetect->isCrawler())
+        {
+            $type = self::TYPE_CRAWLER;
+        }
+        elseif ($mobileDetect->isTablet())
+        {
+            $type = self::TYPE_TABLET;
+        }
+        elseif ($mobileDetect->isMobile())
+        {
+            $type = self::TYPE_MOBILE;
+        }
 
-        return $this;
+        return $type;
     }
 }
