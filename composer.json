@@ -34,5 +34,8 @@
     "psr-4": {
       "Simplon\\Device\\": "src/"
     }
-  }
+  },
+  "replace": {
+    "simplon/device": "0.3.*"
+  },
 }
